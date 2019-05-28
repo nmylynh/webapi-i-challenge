@@ -12,6 +12,24 @@ server.listen(4000, () => {
     console.log('\n*** Server Running on http://localhost:4000 ***\n');
 });
 
-
+//get all users
+server.get('/api/users', (req, res) => {
+// db.find() returns a promise that resolves to a list of existing hubs  
+    db.find()
+        .then(users => { 
+             res
+             .status(200)
+             .json(users);
+        })
+        .catch(err => {
+        // we ran into an error getting the users
+        // use the catch-all 500 status code
+            res
+            .status(500)
+            .json({
+                error: "The users information could not be retrieved." 
+            });
+        });
+});
 
 
