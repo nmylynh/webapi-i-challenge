@@ -69,10 +69,11 @@ server.post('/api/users', (req, res) => {
         }
         db
             .add({ user })
-            .then(users => { 
+            .then(newUser => { 
+                //user added successfully
                  res
-                 .status(200)
-                 .json(users); //this is the payload
+                 .status(201)
+                 .json(newUser); //this is the payload
             })
             .catch(err => {
             // we ran into an error getting the users
@@ -86,3 +87,28 @@ server.post('/api/users', (req, res) => {
     });
 
 
+// delete user
+
+server.delete('/api/users/:id', (req, res) => {
+    const { id } = req.params;
+    db
+      .remove(id)
+      .then(deleted => {
+          //the data layer returns the deleted record
+          //we'll use it to check if the id provided is valid
+        if (deleted) {
+            //.end() ends the request and sends the response with the specified status code
+            //204 is commonly used for delete as there is no need to send anything back
+            res.status(204).end();
+        } else {
+            res.status(404).json({
+                error: "The user with the specified ID does not exist." 
+            });
+        }
+      })
+      .catch(error => {
+        res.status(500).json({
+          error: "The user could not be removed."
+        });
+      });
+  });
