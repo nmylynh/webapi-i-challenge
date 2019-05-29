@@ -33,27 +33,6 @@ server.get('/api/users', (req, res) => {
 });
 
 
-//get all users
-server.get('/api/users', (req, res) => {
-    // db.find() returns a promise that resolves to a list of existing hubs  
-        db.find()
-            .then(users => { 
-                 res
-                 .status(200)
-                 .json(users);
-            })
-            .catch(err => {
-            // we ran into an error getting the users
-            // use the catch-all 500 status code
-                res
-                .status(500)
-                .json({
-                    error: "The users information could not be retrieved." 
-                });
-            });
-    });
-
-
 //post to users
 
 server.post('/api/users', (req, res) => {
@@ -112,3 +91,36 @@ server.delete('/api/users/:id', (req, res) => {
         });
       });
   });
+
+//update user
+
+server.put('/api/users/:id', (req, res) => {
+    const { id } = req.params;
+    const changes = req.body;
+
+    if(!user.name || !user.bio) {
+        return res
+        .status(400)
+        .json({
+            error: "Please provide name and bio for the user."
+        })
+    }
+
+    db.update(id, changes)
+      .then(updated => {
+          if (updated) {
+              res.status(200).json({
+                  updated
+              })
+          } else {
+              res.status(404).json({
+                  error:"The user with the specified ID does not exist."
+              });
+          }
+      })
+      .catch(err => {
+          res.status(500).json({
+            error: "The user information could not be modified." 
+          });
+      });
+});
